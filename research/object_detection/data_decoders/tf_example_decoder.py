@@ -61,6 +61,17 @@ class Visibility(enum.Enum):
   VISIBLE = 2
 
 
+class MyImagedecoder(slim_example_decoder.Image):
+    def tensors_to_item(self, keys_to_tensors):
+        image_buffer = keys_to_tensors[self._image_key]
+        image_format = keys_to_tensors[self._format_key]
+
+        # return np.array([[[image_buffer,image_buffer,image_buffer]]])
+        image = tf.io.read_file(image_buffer)
+        image = tf.image.decode_png(image, channels=3)
+        return image
+
+
 class _ClassTensorHandler(slim_example_decoder.Tensor):
   """An ItemHandler to fetch class ids from class text."""
 
@@ -266,6 +277,7 @@ class TfExampleDecoder(data_decoder.DataDecoder):
           repeated=True,
           dct_method=dct_method)
     else:
+      '''
       image = slim_example_decoder.Image(
           image_key='image/encoded', format_key='image/format', channels=3)
       additional_channel_image = slim_example_decoder.Image(
@@ -273,6 +285,9 @@ class TfExampleDecoder(data_decoder.DataDecoder):
           format_key='image/format',
           channels=1,
           repeated=True)
+      '''
+      image = MyImagedecoder(image_key='image/encoded', format_key='image/format', channels=3)
+
     self.items_to_handlers = {
         fields.InputDataFields.image:
             image,
