@@ -17,6 +17,10 @@ r"""Constructs model, inputs, and training environment."""
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+import horovod.tensorflow as hvd
+
+# Initialize Horovod
+hvd.init()
 
 import copy
 import os
@@ -569,6 +573,8 @@ def train_loop(
         aggregation=tf.compat.v2.VariableAggregation.ONLY_FIRST_REPLICA)
     optimizer, (learning_rate,) = optimizer_builder.build(
         train_config.optimizer, global_step=global_step)
+    optimizer = hvd.DistributedOptimizer(optimizer)
+    
 
     # We run the detection_model on dummy inputs in order to ensure that the
     # model and all its variables have been properly constructed. Specifically,

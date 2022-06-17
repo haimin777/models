@@ -16,7 +16,6 @@
 """Functions to build DetectionModel training optimizers."""
 
 import tensorflow.compat.v1 as tf
-import horovod.tensorflow as hvd
 
 from object_detection.utils import learning_schedules
 from object_detection.utils import tf_version
@@ -30,8 +29,6 @@ try:
   from tensorflow.contrib import opt as tf_opt  # pylint: disable=g-import-not-at-top
 except:  # pylint: disable=bare-except
   pass
-
-hvd.init()
 
 def build_optimizers_tf_v1(optimizer_config, global_step=None):
   """Create a TF v1 compatible optimizer based on config.
@@ -70,7 +67,7 @@ def build_optimizers_tf_v1(optimizer_config, global_step=None):
     optimizer = tf.train.MomentumOptimizer(
         learning_rate,
         momentum=config.momentum_optimizer_value)
-    optimizer = hvd.DistributedOptimizer(optimizer) # Horovod!
+    #optimizer = hvd.DistributedOptimizer(optimizer) # Horovod!
 
 
   if optimizer_type == 'adam_optimizer':
